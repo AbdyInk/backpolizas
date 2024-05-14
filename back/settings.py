@@ -62,7 +62,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5021',
     'http://192.168.100.178:5021',
-    'https://abdyink.github.io',
+    'http://164.92.99.120/',
 ]
 
 SESSION_COOKIE_AGE = 3600
