@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -62,7 +63,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5021',
     'http://192.168.100.178:5021',
-    'http://164.92.99.120/',
+    'http://164.92.99.120',
 ]
 
 SESSION_COOKIE_AGE = 3600
@@ -136,9 +137,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-STATIC_ROOT = '/root/static'
-MEDIA_ROOT = '/root/media'
+MEDIA_URLS ='/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
