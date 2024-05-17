@@ -58,13 +58,13 @@ def get_polizas(request):
         # Comprobar si es "admin" -> Desplega todos los registros de polizas
         if request.user.username == "admin":
             # Recoge todas las polizas existentes
-            y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[]], {'fields': ['x_name', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
+            y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
         # Si es falso -> Solo desplega las polizas de el usuario autenticado
         else: 
             # Busca el cliente del usuario coincidente a la base de datos de Odoo
             x = models.execute_kw(db, uid, password, 'x_usuarios', 'search_read', [[['x_name', '=', request.user.username]]], {'fields': ['x_studio_cliente'], 'limit': 2000})
             # Recoge las polizas coincidentes al cliente
-            y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_cliente', '=', x[0]['x_studio_cliente'][1]]]], {'fields': ['x_name', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
+            y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_cliente', '=', x[0]['x_studio_cliente'][1]]]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
 
         # Arroja las polizas obtenidas
         return Response(y)
@@ -84,7 +84,7 @@ def gpoliza_s(request):
     # Comprueba si "numero" existe
     if numero:
         # Pide a Odoo la poliza coincidente a "numero"
-        x = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_num', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
+        x = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_num', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
         # Devuelve los datos de la poliza al front
         return Response(x[0])
     else:
@@ -102,7 +102,7 @@ def gequipo_s(request):
     # Comprueba si "numero" existe
     if numero:
         # Pide a Odoo la poliza coincidente a "numero"
-        x = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_num', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_tipo', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
+        x = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_num', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_tipo', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
         # Pide a Odoo los equipos coincidentes a la poliza
         y = models.execute_kw(db, uid, password, 'x_equipos_de_poliza', 'search_read', [[['x_studio_poliza', '=', x[0]['x_name']]]], {'fields': ['x_name', 'x_studio_marca', 'x_studio_modelo', 'x_studio_serie'], 'limit': 2000})
 
@@ -236,7 +236,7 @@ def greporte(request):
 def polizas(request):
     
     #Busca y recoge todos los registros del modelo polizas
-    y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[]], {'fields': ['x_name', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
+    y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
 
     # Arroja los registros obtenidos 
     return Response(y)
