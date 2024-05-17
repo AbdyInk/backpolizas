@@ -6,10 +6,14 @@ import json
 
 User = get_user_model()
 
-url = 'https://vito-technologies.odoo.com'
-db = 'vito-technologies'
-un = 'ventas@vitotechnologies.com'
-pw = '4dm1n!'
+with open('./secrets/url.txt') as a:
+    url = a.read().strip()
+with open('./secrets/db.txt') as b:
+    db = b.read().strip()
+with open('./secrets/username.txt') as c:
+    un = c.read().strip()
+with open('./secrets/password.txt') as d:
+    pw = d.read().strip()
 
 common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
 uid = common.authenticate(db, un, pw, {})

@@ -15,10 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
- 
+from django.urls import include, path, re_path
+from django.conf import settings # new
+from  django.conf.urls.static import static #new
+from django.views.static import serve
+
 urlpatterns = [
     path("odoo/", include("odoo.urls")),
     path("admin/", admin.site.urls),
+    re_path(r'^dashboard/$', serve, kwargs={'path': 'index.html', 'document_root': settings.STATIC_ROOT}),
     #path('api/', include('vtsa.urls'))
 ]
