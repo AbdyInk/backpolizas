@@ -64,9 +64,10 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5021',
     'http://192.168.100.178:5021',
     'http://164.92.99.120',
+    'http://216.225.203.227',
 ]
 
-SESSION_COOKIE_AGE = 3600
+SESSION_COOKIE_AGE = 7200
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -140,6 +141,12 @@ STATIC_URL = '/static/'
 MEDIA_URLS ='/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_DIRS = [
+    BASE_DIR / "dashboard",
+    "/root/dashboard",
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

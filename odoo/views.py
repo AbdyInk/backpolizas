@@ -46,6 +46,114 @@ def index(request):
 
     return Response(m)
 
+@api_view(['GET'])
+def gservicio_s(request):
+    # Comprobar si esta autenticado
+    if request.user.is_authenticated:
+        # Para usuarios autenticados
+        # Comprobar si es "admin" -> Desplega todos los registros de polizas
+        if request.user.username == "admin":
+            # Recoge todas los servicios existentes
+            y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+        # Si es falso -> Solo desplega las polizas de el usuario autenticado
+        else: 
+            # Busca el cliente del usuario coincidente a la base de datos de Odoo
+            x = models.execute_kw(db, uid, password, 'x_usuarios', 'search_read', [[['x_name', '=', request.user.username]]], {'fields': ['x_studio_cliente'], 'limit': 2000})
+            # Recoge los servicios coincidentes al cliente
+            y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_studio_cliente', '=', x[0]['x_studio_cliente'][1]]]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+
+        # Arroja los servicios obtenidos
+        return Response(y)
+    # Si no esta autenticado, arroja "Nope" como respuesta
+    else:
+        # Para usuarios no autenticados
+        return HttpResponse("Nope")
+    
+@api_view(['GET'])
+def gservicio_s_gpoliza(request):
+    # Recoge en una variable "numero"
+    numero = request.GET.get("numero")
+
+    # Comprueba si "numero" existe
+    if numero:
+        # Pide a Odoo los servicios coincidentes a la poliza
+        y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_studio_poliza', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+
+        # Devuelve los datos de los servicios al front
+        return Response(y)
+    else:
+    # En caso de que no exista "numero"
+        return HttpResponse("Nope")
+    
+@api_view(['GET'])
+def gservicio(request):
+    # Recoge en una variable "idenf"
+    numero = request.GET.get("numero")
+    
+    # Comprueba si "idenf" existe
+    if numero:
+        # Pide a Odoo el equipo coincidente a "idenf"
+        y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_name', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+
+        # Devuelve los datos del equipo al front
+        return Response(y[0])
+    else:
+    # En caso de que no exista "idenf"
+        return HttpResponse("Nope")
+    
+@api_view(['GET'])
+def greporte_s_gservicio(request):
+    # Recoge en una variable "numero"
+    numero = request.GET.get("numero")
+
+    # Comprueba si "numero" existe
+    if numero:
+        # Pide a Odoo los reportes coincidentes a "idenf"
+        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_servicio', '=', str(numero)]]], {'fields': [
+        #Datos del equipo
+        'x_name', 'x_studio_equipo', 
+        'x_studio_tipo', 'x_studio_poliza', 
+        'x_studio_serie', 'x_studio_modelo',
+        'x_studio_parte',
+        #Datos del cliente 
+        'x_studio_encargado', 'x_studio_area', 
+        'x_studio_direccion',
+        #Datos del servicio
+        'x_studio_tecnico', 'x_studio_folio',
+        'x_studio_fecha_mantenimiento', 'x_studio_siguiente_mantenimiento',
+        'x_studio_mantenimiento_asignado', 'x_studio_revision',
+        'x_studio_reemplazo',
+        #Reporte
+        'x_studio_otros', 'x_studio_falla',
+        'x_studio_observaciones', 'x_estado',
+        ], 'limit': 2000})
+
+        # Devuelve los datos de los reportes al front
+        return Response(y)
+    else:
+    # En caso de que no exista "numero"
+        return HttpResponse("Nope")
+    
+@api_view(['GET'])
+def gequipo_s_gservicio(request):
+    # Recoge en una variable "numero"
+    numero = request.GET.get("numero")
+
+    # Comprueba si "numero" existe
+    if numero:
+        # Pide a Odoo los reportes coincidentes a "idenf"
+        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_servicio', '=', str(numero)]]], {'fields': ['x_studio_equipo'], 'limit': 2000})
+        z = []
+        for x in y:
+            print(x['x_studio_equipo'][1])
+            h = (models.execute_kw(db, uid, password, 'x_equipos_de_poliza', 'search_read', [[['x_name', '=', x['x_studio_equipo'][1]]]], {'fields': ['x_name', 'x_studio_marca', 'x_studio_modelo', 'x_studio_serie'], 'limit': 2000}))
+            z.append(h[0])
+        # Devuelve los datos de los reportes al front
+        return Response(z)
+    else:
+    # En caso de que no exista "numero"
+        return HttpResponse("Nope")
+
 # Vista polizas /odoo/gpolizas
 # Comprueba si hay un usuario autenticado, en caso de ser verdadero hace otra comprobación
 # Comprueba si el usuario es "admin", en caso de ser verdadero arroja todas las polizas existentes de la base de datos Odoo
@@ -84,7 +192,7 @@ def gpoliza_s(request):
     # Comprueba si "numero" existe
     if numero:
         # Pide a Odoo la poliza coincidente a "numero"
-        x = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_num', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
+        x = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_name', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_periodo', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
         # Devuelve los datos de la poliza al front
         return Response(x[0])
     else:
@@ -101,10 +209,8 @@ def gequipo_s(request):
 
     # Comprueba si "numero" existe
     if numero:
-        # Pide a Odoo la poliza coincidente a "numero"
-        x = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[['x_studio_num', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_tipo', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
         # Pide a Odoo los equipos coincidentes a la poliza
-        y = models.execute_kw(db, uid, password, 'x_equipos_de_poliza', 'search_read', [[['x_studio_poliza', '=', x[0]['x_name']]]], {'fields': ['x_name', 'x_studio_marca', 'x_studio_modelo', 'x_studio_serie'], 'limit': 2000})
+        y = models.execute_kw(db, uid, password, 'x_equipos_de_poliza', 'search_read', [[['x_studio_poliza', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_marca', 'x_studio_modelo', 'x_studio_serie'], 'limit': 2000})
 
         # Devuelve los datos de los equipos al front
         return Response(y)
@@ -228,6 +334,77 @@ def greporte(request):
     else:
     # En caso de que no exista "idenf"
         return HttpResponse("Nope")
+    
+@api_view(['GET'])
+def greporte_s_user(request):
+    # Comprobar si esta autenticado
+    if request.user.is_authenticated:
+        # Para usuarios autenticados
+        # Comprobar si es "admin" -> Desplega todos los registros de polizas
+        if request.user.username == "admin":
+            # Recoge todas las polizas existentes
+            y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[]], {'fields': [
+            #Datos del equipo
+            'x_name', 'x_studio_equipo', 
+            'x_studio_tipo', 'x_studio_poliza', 
+            'x_studio_serie', 'x_studio_modelo',
+            'x_studio_parte',
+            #Datos del cliente 
+            'x_studio_encargado', 'x_studio_area', 
+            'x_studio_direccion',
+            #Datos del servicio
+            'x_studio_tecnico', 'x_studio_folio',
+            'x_studio_fecha_mantenimiento', 'x_studio_siguiente_mantenimiento',
+            'x_studio_mantenimiento_asignado', 'x_studio_revision',
+            'x_studio_reemplazo',
+            #Checklist 
+            'x_studio_c_limpieza_interna', 'x_studio_c_limpieza_externa', 
+            'x_studio_c_cabezal', 'x_studio_rodillo',
+            'x_studio_bandas', 'x_studio_c_sensores',
+            'x_studio_c_configuracion', 'x_studio_c_presion',
+            'x_studio_c_calidad', 'x_studio_c_otros',
+            #Reporte
+            'x_studio_otros', 'x_studio_falla',
+            'x_studio_observaciones', 'x_estado',
+            ], 'limit': 2000})
+        # Si es falso -> Solo desplega las polizas de el usuario autenticado
+        else: 
+            # Busca el cliente del usuario coincidente a la base de datos de Odoo
+            x = models.execute_kw(db, uid, password, 'x_usuarios', 'search_read', [[['x_name', '=', request.user.username]]], {'fields': ['x_studio_cliente'], 'limit': 2000})
+            # Recoge las polizas coincidentes al cliente
+            y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_direccion', '=', x[0]['x_studio_cliente'][1]]]], {'fields': [
+            #Datos del equipo
+            'x_name', 'x_studio_equipo', 
+            'x_studio_tipo', 'x_studio_poliza', 
+            'x_studio_serie', 'x_studio_modelo',
+            'x_studio_parte',
+            #Datos del cliente 
+            'x_studio_encargado', 'x_studio_area', 
+            'x_studio_direccion',
+            #Datos del servicio
+            'x_studio_tecnico', 'x_studio_folio',
+            'x_studio_fecha_mantenimiento', 'x_studio_siguiente_mantenimiento',
+            'x_studio_mantenimiento_asignado', 'x_studio_revision',
+            'x_studio_reemplazo',
+            #Reporte
+            'x_studio_otros', 'x_studio_falla',
+            'x_studio_observaciones', 'x_estado',
+            ], 'limit': 2000})
+            # Arroja las polizas obtenidas
+        return Response(y)
+    # Si no esta autenticado, arroja "Nope" como respuesta
+    else:
+        # Para usuarios no autenticados
+        return HttpResponse("Nope")
+
+@api_view(['GET'])
+def servicios(request):
+    
+    #Busca y recoge todos los registros del modelo servicios de mantenimiento
+    y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+
+    # Arroja los registros obtenidos 
+    return Response(y)
 
 # Vista polizas /odoo/polizas
 # Arroja todas las polizas existentes en el sistema Odoo
@@ -236,7 +413,7 @@ def greporte(request):
 def polizas(request):
     
     #Busca y recoge todos los registros del modelo polizas
-    y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
+    y = models.execute_kw(db, uid, password, 'x_polizas', 'search_read', [[]], {'fields': ['x_name', 'x_studio_servicio', 'x_studio_num', 'x_studio_periodo', 'x_studio_fecha_inicio', 'x_studio_fecha_expiro', 'x_studio_cliente', 'x_studio_equipos', 'x_studio_tipo'], 'limit': 2000})
 
     # Arroja los registros obtenidos 
     return Response(y)
