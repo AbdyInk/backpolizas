@@ -145,7 +145,6 @@ def gequipo_s_gservicio(request):
         y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_servicio', '=', str(numero)]]], {'fields': ['x_studio_equipo'], 'limit': 2000})
         z = []
         for x in y:
-            print(x['x_studio_equipo'][1])
             h = (models.execute_kw(db, uid, password, 'x_equipos_de_poliza', 'search_read', [[['x_name', '=', x['x_studio_equipo'][1]]]], {'fields': ['x_name', 'x_studio_marca', 'x_studio_modelo', 'x_studio_serie'], 'limit': 2000}))
             z.append(h[0])
         # Devuelve los datos de los reportes al front
