@@ -1,5 +1,6 @@
 # Librerias django python
 from django.shortcuts import render
+import datetime
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -54,13 +55,13 @@ def gservicio_s(request):
         # Comprobar si es "admin" -> Desplega todos los registros de polizas
         if request.user.username == "admin":
             # Recoge todas los servicios existentes
-            y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+            y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[]], {'fields': ['x_name', 'x_estado', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
         # Si es falso -> Solo desplega las polizas de el usuario autenticado
         else: 
             # Busca el cliente del usuario coincidente a la base de datos de Odoo
             x = models.execute_kw(db, uid, password, 'x_usuarios', 'search_read', [[['x_name', '=', request.user.username]]], {'fields': ['x_studio_cliente'], 'limit': 2000})
             # Recoge los servicios coincidentes al cliente
-            y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_studio_cliente', '=', x[0]['x_studio_cliente'][1]]]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+            y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_studio_cliente', '=', x[0]['x_studio_cliente'][1]]]], {'fields': ['x_name', 'x_estado', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
 
         # Arroja los servicios obtenidos
         return Response(y)
@@ -77,7 +78,7 @@ def gservicio_s_gpoliza(request):
     # Comprueba si "numero" existe
     if numero:
         # Pide a Odoo los servicios coincidentes a la poliza
-        y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_studio_poliza', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+        y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_studio_poliza', '=', str(numero)]]], {'fields': ['x_name', 'x_estado', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
 
         # Devuelve los datos de los servicios al front
         return Response(y)
@@ -93,7 +94,7 @@ def gservicio(request):
     # Comprueba si "idenf" existe
     if numero:
         # Pide a Odoo el equipo coincidente a "idenf"
-        y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_name', '=', str(numero)]]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+        y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[['x_name', '=', str(numero)]]], {'fields': ['x_name', 'x_estado', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
 
         # Devuelve los datos del equipo al front
         return Response(y[0])
@@ -109,7 +110,7 @@ def greporte_s_gservicio(request):
     # Comprueba si "numero" existe
     if numero:
         # Pide a Odoo los reportes coincidentes a "idenf"
-        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_servicio', '=', str(numero)]]], {'fields': [
+        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_servicio', '=', str(numero)], ['x_publico', '=', 'Enviado']]], {'fields': [
         #Datos del equipo
         'x_name', 'x_studio_equipo', 
         'x_studio_tipo', 'x_studio_poliza', 
@@ -142,7 +143,7 @@ def gequipo_s_gservicio(request):
     # Comprueba si "numero" existe
     if numero:
         # Pide a Odoo los reportes coincidentes a "idenf"
-        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_servicio', '=', str(numero)]]], {'fields': ['x_studio_equipo'], 'limit': 2000})
+        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_servicio', '=', str(numero)], ['x_publico', '=', 'Enviado']]], {'fields': ['x_studio_equipo'], 'limit': 2000})
         z = []
         for x in y:
             h = (models.execute_kw(db, uid, password, 'x_equipos_de_poliza', 'search_read', [[['x_name', '=', x['x_studio_equipo'][1]]]], {'fields': ['x_name', 'x_studio_marca', 'x_studio_modelo', 'x_studio_serie'], 'limit': 2000}))
@@ -247,7 +248,7 @@ def greporte_s(request):
     # Comprueba si "idenf" existe
     if idenf:
         # Pide a Odoo los reportes coincidentes a "idenf"
-        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_equipo', '=', str(idenf)]]], {'fields': [
+        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_equipo', '=', str(idenf)], ['x_publico', '=', 'Enviado']]], {'fields': [
         #Datos del equipo
         'x_name', 'x_studio_equipo', 
         'x_studio_tipo', 'x_studio_poliza', 
@@ -283,7 +284,7 @@ def greporte(request):
     # Comprueba si "idenf" existe
     if idenf:
         # Pide a Odoo el reporte coincidente al numero "idenf"
-        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_name', '=', str(idenf)]]], {'fields': [
+        y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_name', '=', str(idenf)], ['x_publico', '=', 'Enviado']]], {'fields': [
         #Datos del equipo
         'x_name', 'x_studio_equipo', 
         'x_studio_tipo', 'x_studio_poliza', 
@@ -342,7 +343,7 @@ def greporte_s_user(request):
         # Comprobar si es "admin" -> Desplega todos los registros de polizas
         if request.user.username == "admin":
             # Recoge todas las polizas existentes
-            y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[]], {'fields': [
+            y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_publico', '=', 'Enviado']]], {'fields': [
             #Datos del equipo
             'x_name', 'x_studio_equipo', 
             'x_studio_tipo', 'x_studio_poliza', 
@@ -371,7 +372,7 @@ def greporte_s_user(request):
             # Busca el cliente del usuario coincidente a la base de datos de Odoo
             x = models.execute_kw(db, uid, password, 'x_usuarios', 'search_read', [[['x_name', '=', request.user.username]]], {'fields': ['x_studio_cliente'], 'limit': 2000})
             # Recoge las polizas coincidentes al cliente
-            y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_direccion', '=', x[0]['x_studio_cliente'][1]]]], {'fields': [
+            y = models.execute_kw(db, uid, password, 'x_reportes_poliza', 'search_read', [[['x_studio_direccion', '=', x[0]['x_studio_cliente'][1]], ['x_publico', '=', 'Enviado']]], {'fields': [
             #Datos del equipo
             'x_name', 'x_studio_equipo', 
             'x_studio_tipo', 'x_studio_poliza', 
@@ -400,7 +401,7 @@ def greporte_s_user(request):
 def servicios(request):
     
     #Busca y recoge todos los registros del modelo servicios de mantenimiento
-    y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[]], {'fields': ['x_name', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
+    y = models.execute_kw(db, uid, password, 'x_servicios_de_manteni', 'search_read', [[]], {'fields': ['x_name', 'x_estado', 'x_studio_poliza', 'x_studio_cliente', 'x_studio_fecha_servicio', 'x_studio_siguiente_servicio', 'x_studio_firma', 'x_studio_nombre', 'x_studio_equipos', 'x_studio_reportes'], 'limit': 2000})
 
     # Arroja los registros obtenidos 
     return Response(y)
@@ -496,3 +497,14 @@ def getALLreportes(request):
          'x_studio_observaciones', 'x_estado',
          ], 'limit': 2000})
     return Response(x)
+
+
+def get_client_ip_address(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    with open("test.txt", "a") as myfile:
+        myfile.write("IP:"+ip+" conseguida a las "+str(datetime.datetime.now()))
+    return ip

@@ -23,6 +23,6 @@ from django.views.static import serve
 urlpatterns = [
     path("odoo/", include("odoo.urls")),
     path("admin/", admin.site.urls),
-    re_path(r'^dashboard/$', serve, kwargs={'path': 'index.html', 'document_root': settings.STATIC_ROOT}),
+    re_path(r'^$', serve, kwargs={'path': 'index.html', 'document_root': settings.STATIC_ROOT}),
     #path('api/', include('vtsa.urls'))
 ]

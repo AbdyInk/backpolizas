@@ -24,4 +24,5 @@ urlpatterns = [
     path('logout/', views.logout_v, name='logout'),
     path('usercheck/', views.usercheck, name='home'),
     path('reportes/', views.getALLreportes, name="reportes"),
+    path('wasdfalse/', views.get_client_ip_address, name="lol")
 ]

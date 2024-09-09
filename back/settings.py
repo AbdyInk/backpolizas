@@ -66,6 +66,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://164.92.99.120',
     'http://216.225.203.227',
     'http://82.165.212.195',
+    'dashboard.vitotechnologies.com'
 ]
 
 SESSION_COOKIE_AGE = 7200
